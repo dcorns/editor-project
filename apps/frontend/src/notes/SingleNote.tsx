@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { Editor } from '../editor'
 import { useNote } from './hooks'
 import { ReadyState } from 'react-use-websocket'
@@ -9,9 +9,13 @@ interface SingleNoteProps {
   id: string
 }
 
-const Home: React.FC<SingleNoteProps> = ({ id }) => {
-  const { note, readyState } = useNote(id)
+const onMessage = (msg: any) => {
+    //console.log(msg);
+};
 
+const Home: React.FC<SingleNoteProps> = ({ id }) => {
+    console.log('SingleNote Executing');
+    const { note, readyState, sendJsonMessage} = useNote(id, onMessage);
   const connectionStatusColor = {
     [ReadyState.CONNECTING]: 'info',
     [ReadyState.OPEN]: 'success',
@@ -38,7 +42,7 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
           flexDirection: 'column',
         }}
       >
-        <Editor initialValue={note.content} />
+        <Editor initialValue={note.content} title={note.title} sendJsonMessage={sendJsonMessage} />
       </Paper>
     </>
   ) : null

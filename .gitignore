@@ -34,3 +34,5 @@ yarn-error.log*
 .vercel
 
 ./idea
+/apps/backend/editor-moch-firebase-adminsdk-xa1uj-7d0e34fdde.json
+/apps/frontend/src/notes/firebase.json
