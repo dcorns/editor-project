@@ -1,21 +1,15 @@
-import React, {useState} from 'react'
+import React from 'react'
 import { Editor } from '../editor'
 import { useNote } from './hooks'
 import { ReadyState } from 'react-use-websocket'
-
 import { Paper, TextField, Badge, BadgeTypeMap } from '@mui/material'
 
 interface SingleNoteProps {
   id: string
 }
 
-const onMessage = (msg: any) => {
-    //console.log(msg);
-};
-
 const Home: React.FC<SingleNoteProps> = ({ id }) => {
-    console.log('SingleNote Executing');
-    const { note, readyState, sendJsonMessage} = useNote(id, onMessage);
+    const { note, readyState, sendJsonMessage} = useNote(id);
   const connectionStatusColor = {
     [ReadyState.CONNECTING]: 'info',
     [ReadyState.OPEN]: 'success',

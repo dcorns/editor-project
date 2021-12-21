@@ -37,14 +37,11 @@ export const Editor: React.FC<EditorProps> = ({ initialValue = [], placeholder, 
     sendJsonMessage({title, content:noteData});
   };
 
-  console.log('Editor Executing');
-
   return (
     <Slate editor={editor}
            value={value}
            onChange={value => {
              setValue(value);
-             //sendJsonMessage(value);
            const isAstChange = editor.operations.some(
              (op:any) => 'set_selection' !== op.type //todo: Define or obtain editor operation type
              )

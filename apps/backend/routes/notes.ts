@@ -30,15 +30,13 @@ const noteList: any = [];//todo: define type
 const db = admin.database();
 const ref = db.ref('notes');
 ref.on('value', (snapshot) => {
-    console.log('data read in notes route');
+    noteList.length = 0;
     notes = snapshot.val();
-    console.log(notes);
     Object.keys(notes).forEach((noteId) => {
         const noteData = JSON.parse(notes[noteId].note);
         notes[noteId].note = noteData;
         noteList.push({id: noteId, title: noteData.title});
     });
-    console.dir(notes);
 }, (err) => {
     console.log('Read failed:', err.name);
 });
@@ -46,15 +44,6 @@ ref.on('value', (snapshot) => {
 const notesHandler: RequestHandler = (_req, res: Response<NotesResponse>) => {
     res.json({
         notes: noteList
-        // notes: [
-        //     {
-        //         id: NOTE_1.id,
-        //         title: NOTE_1.title
-        //     }, {
-        //         id: NOTE_2.id,
-        //         title: NOTE_2.title
-        //     }
-        // ]
     })
 }
 
@@ -68,7 +57,6 @@ const storeNote = (noteId: string, note: any, ws: any) => {
             if (err) {
                 console.log('error saving data');
             } else {
-                //broadcast note changes
                 console.log('storeNote-try-success');
                 ws.send(note);
             }
@@ -82,7 +70,6 @@ const storeNote = (noteId: string, note: any, ws: any) => {
             if (err) {
                 console.log('error saving data');
             } else {
-                //broadcast note changes
                 ws.send(note);
             }
         });
@@ -91,36 +78,19 @@ const storeNote = (noteId: string, note: any, ws: any) => {
 
 const noteHandler: WebsocketRequestHandler = (ws, req) => {
     ws.on('message', (message) => {
-        console.log('websocket message received: ' + req.params.id);
         const msg = message.toString();
-
-        //console.log(msg);
-        //const dbRules = await db.getRules();
-        //console.log('dbRules:',dbRules);
         if (msg) {
             console.log(msg);
             storeNote(req.params.id, msg, ws);
-            //ws.send(msg);
         }
         if(req.params.id !== undefined){//block appears to execute even when undefined
             try{
                 ws.send(JSON.stringify(notes[req.params.id].note));
-                console.log('Not undefined');
-
             }catch(e){
-                console.error(e);
+                console.error('Executing on undefined req.params.id');
             }
 
         }
-        // switch (req.params.id) {
-        //     case NOTE_1.id: {
-        //         return ws.send(JSON.stringify(NOTE_1))
-        //     }
-        //     case NOTE_2.id: {
-        //         return ws.send(JSON.stringify(NOTE_2))
-        //     }
-        // }
-
     })
 }
 

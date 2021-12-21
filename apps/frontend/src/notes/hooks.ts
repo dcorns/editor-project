@@ -16,7 +16,6 @@ const fetcher = async (
 
 export const useNotesList = () => {
   const { data, error } = useSWR<NotesResponse>('http://localhost:3001/api/notes', fetcher)
-  console.log('data from useNotes');
   return {
     notesList: data?.notes,
     isLoading: !error && !data,
@@ -24,10 +23,8 @@ export const useNotesList = () => {
   }
 }
 
-export const useNote = (id: string, onMessage: any) => {
-  const { readyState, lastMessage, sendMessage, sendJsonMessage, lastJsonMessage } = useWebSocket(`ws://localhost:3001/api/notes/${id}`,
-      {onMessage})
-  console.log('data from use Note');
+export const useNote = (id: string) => {
+  const { readyState, lastMessage, sendMessage, sendJsonMessage, lastJsonMessage } = useWebSocket(`ws://localhost:3001/api/notes/${id}`)
   // Send a message when ready on first load
   useEffect(() => {
     if (readyState === ReadyState.OPEN && lastMessage === null) {
@@ -36,7 +33,6 @@ export const useNote = (id: string, onMessage: any) => {
       console.log(lastMessage.data);
     }
   }, [readyState, lastMessage])
-  
 
   return {
     note: lastMessage && JSON.parse(lastMessage.data) as NoteResponse,
