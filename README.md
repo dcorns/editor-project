@@ -13,3 +13,13 @@ Start the dev server on [http://localhost:3000](http://localhost:3000) by runnin
 ## Type checking and linting
 
 Each app has a `check` script that runs the linting and typechecking. Run it in all apps from the root by running: `npm run check --workspaces`.
+
+##Updates
+1) Persist data changes in realtime to firebase database
+2) Broadcast changes to firebase database in realtime
+3) Use database state as the source of truth for all clients
+
+##Issues
+1) Default note body is not displayed
+2) Using isAstChange in Editor causes a managed state to un-managed state error
+3) Clicking on note in noteList causes 4 calls to useNote

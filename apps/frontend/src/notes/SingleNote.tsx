@@ -10,6 +10,8 @@ interface SingleNoteProps {
 
 const Home: React.FC<SingleNoteProps> = ({ id }) => {
     const { note, readyState, sendJsonMessage} = useNote(id);
+    console.log('SingleNote-note:');
+    console.dir(note);
   const connectionStatusColor = {
     [ReadyState.CONNECTING]: 'info',
     [ReadyState.OPEN]: 'success',
@@ -18,7 +20,9 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
     [ReadyState.UNINSTANTIATED]: 'error',
   }[readyState] as BadgeTypeMap['props']['color']
 
-  return note ? (
+    console.log('SingleNote-readyState: ', connectionStatusColor);
+
+  return (note) ? (
     <>
       <Badge color={connectionStatusColor} variant="dot" sx={{ width: '100%' }}>
         <TextField
@@ -39,7 +43,7 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
         <Editor initialValue={note.content} title={note.title} sendJsonMessage={sendJsonMessage} />
       </Paper>
     </>
-  ) : null
+   ) : null
 }
 
 export default Home

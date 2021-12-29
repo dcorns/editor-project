@@ -1,6 +1,6 @@
 // @refresh reset // Fixes hot refresh errors in development https://github.com/ianstormtaylor/slate/issues/3477
 
-import React, { useCallback, useMemo, useState, useEffect} from 'react'
+import React, { useCallback, useMemo, useState} from 'react'
 import {createEditor, Descendant, BaseEditor} from 'slate'
 import { withHistory, HistoryEditor } from 'slate-history'
 import { handleHotkeys } from './helpers'
@@ -23,7 +23,7 @@ interface EditorProps {
   initialValue?: Descendant[]
   placeholder?: string
   title: string
-  sendJsonMessage: any //todo: Find propertype for this
+  sendJsonMessage: any //todo: Find proper type for this
 }
 
 export const Editor: React.FC<EditorProps> = ({ initialValue = [], placeholder, title, sendJsonMessage }) => {
@@ -33,7 +33,7 @@ export const Editor: React.FC<EditorProps> = ({ initialValue = [], placeholder, 
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   const onNoteChange = (noteData: any) => {
-    console.log('sending json message to server');
+    console.log('sending json message to server', title, noteData);
     sendJsonMessage({title, content:noteData});
   };
 

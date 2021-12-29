@@ -2,6 +2,7 @@ import express, {RequestHandler, Response} from 'express'
 import {WebsocketRequestHandler} from 'express-ws'
 import {Descendant} from 'slate'
 import admin from '../firebase';
+import getGuid from '../getGuid';
 
 // Patch `express.Router` to support `.ws()` without needing to pass around a `ws`-ified app.
 // https://github.com/HenningM/express-ws/issues/86
@@ -18,6 +19,11 @@ export interface NotesResponse {
     }>
 }
 
+export interface NewNoteResponse {
+    id: string
+}
+
+
 export interface NoteResponse {
     id: string
     title: string
@@ -25,29 +31,36 @@ export interface NoteResponse {
 }
 
 let notes:any = {};//todo: define type
-const noteList: any = [];//todo: define type
 
 const db = admin.database();
 const ref = db.ref('notes');
 ref.on('value', (snapshot) => {
-    noteList.length = 0;
+    console.log('Data Read in notes.ts');
     notes = snapshot.val();
-    Object.keys(notes).forEach((noteId) => {
-        const noteData = JSON.parse(notes[noteId].note);
-        notes[noteId].note = noteData;
-        noteList.push({id: noteId, title: noteData.title});
-    });
-}, (err) => {
+    console.log('db.ref.on snapshot data:');
+    console.dir(notes);
+ }, (err) => {
     console.log('Read failed:', err.name);
 });
 
-const notesHandler: RequestHandler = (_req, res: Response<NotesResponse>) => {
-    res.json({
-        notes: noteList
+// const notesHandler: RequestHandler = (_req, res: Response<NotesResponse>) => {
+//     res.json({
+//         notes: noteList
+//     })
+// }
+const notesWSHandler: WebsocketRequestHandler = (ws, req) => {
+    console.log('notesWSHandler');
+    ws.on('message', (message) =>{
+        const msg = message.toString();
+        console.log('notesWSHandler on message: ', msg);
+        if(msg === 'getNotes'){
+            ws.send(JSON.stringify(notes));
+        }
     })
 }
 
-const storeNote = (noteId: string, note: any, ws: any) => {
+const storeNote = (noteId: string, note: any, ws?: any) => {
+    console.log('Storing Note:', noteId);
     const ref = db.ref('notes');
     try {
         const noteRef = ref.child(noteId);
@@ -58,7 +71,7 @@ const storeNote = (noteId: string, note: any, ws: any) => {
                 console.log('error saving data');
             } else {
                 console.log('storeNote-try-success');
-                ws.send(note);
+                if (ws) ws.send(JSON.stringify(note));
             }
         });
     } catch (e) {
@@ -70,7 +83,7 @@ const storeNote = (noteId: string, note: any, ws: any) => {
             if (err) {
                 console.log('error saving data');
             } else {
-                ws.send(note);
+                if(ws) ws.send(note);
             }
         });
     }
@@ -79,22 +92,40 @@ const storeNote = (noteId: string, note: any, ws: any) => {
 const noteHandler: WebsocketRequestHandler = (ws, req) => {
     ws.on('message', (message) => {
         const msg = message.toString();
-        if (msg) {
-            console.log(msg);
-            storeNote(req.params.id, msg, ws);
+        const id = req.params.id;
+        let data:any; //todo: fix type
+        console.log('id:',id);
+        console.log('msg',msg);
+        if(msg.length > 1){
+            data = JSON.parse(msg);
         }
-        if(req.params.id !== undefined){//block appears to execute even when undefined
+
+        if (data) {
+            console.dir(data);
+            storeNote(id, data, ws);
+        }
+        if(id !== undefined){//block appears to execute even when undefined
             try{
-                ws.send(JSON.stringify(notes[req.params.id].note));
+                ws.send(JSON.stringify(notes[id].note));
             }catch(e){
-                console.error('Executing on undefined req.params.id');
+                console.error('Executing on undefined req.params.id: ', id);
             }
 
         }
     })
 }
 
-router.get('/', notesHandler)
+const newNoteHandler: RequestHandler = (_req, res: Response<NewNoteResponse>) =>{
+    console.log('routes/notes/newNoteHandler');
+    const id = getGuid(Date.now().toString(), 'SecretSanta');
+    const note = {title: 'New Note', content:[{children:[{text: 'Enter note', italic:true}], type: 'paragraph'}]};
+    storeNote(id, note);
+    res.json({
+        id
+    })
+}
+router.get('/newnote', newNoteHandler);
+//router.get('/', notesHandler)
 router.ws('/:id', noteHandler)
-
+router.ws('/', notesWSHandler);
 export default router
