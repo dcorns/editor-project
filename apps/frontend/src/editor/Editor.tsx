@@ -23,16 +23,17 @@ interface EditorProps {
   initialValue?: Descendant[]
   placeholder?: string
   title: string
-  sendJsonMessage: any //todo: Find proper type for this
+  sendJsonMessage: any //todo: Find proper type for these
 }
 
-export const Editor: React.FC<EditorProps> = ({ initialValue = [], placeholder, title, sendJsonMessage }) => {
+export const Editor: React.FC<EditorProps> = ({ initialValue = [], placeholder, title, sendJsonMessage}) => {
   const [value, setValue] = useState<Array<Descendant>>(initialValue)
+  console.log('Editor');
   const renderElement = useCallback(props => <CustomElement {...props} />, [])
   const renderLeaf = useCallback(props => <CustomLeaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
-  const onNoteChange = (noteData: any) => {
+  const onNoteChange = (noteData: any) => {//todo: set to specific type
     console.log('sending json message to server', title, noteData);
     sendJsonMessage({title, content:noteData});
   };

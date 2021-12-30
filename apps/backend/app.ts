@@ -10,6 +10,7 @@ const PORT = 3001
 const ws = expressWs(app);
 const aWss = ws.getWss();
 
+//Send updated notes to all sockets on database change
 const db = admin.database();
 const ref = db.ref('notes');
 ref.on('value', (snapshot) => {
@@ -21,6 +22,12 @@ ref.on('value', (snapshot) => {
 }, (err) => {
   console.log('Read failed:', err.name);
 });
+
+//Future possibility of having more granular identification of change in db
+// ref.on('child_changed', (snapshot) => {
+//   //console.log(`app-db-child-changed-parent-key:`, snapshot.ref.parent.key);
+//   console.dir(snapshot.val());
+// });
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))

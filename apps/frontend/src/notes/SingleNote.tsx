@@ -10,8 +10,15 @@ interface SingleNoteProps {
 
 const Home: React.FC<SingleNoteProps> = ({ id }) => {
     const { note, readyState, sendJsonMessage} = useNote(id);
+    let nt = note;
     console.log('SingleNote-note:');
-    console.dir(note);
+
+    if(note && note[id]){
+        console.log(`full list received:`);
+        console.dir(note[id].note);
+        nt = note[id].note;
+    }
+
   const connectionStatusColor = {
     [ReadyState.CONNECTING]: 'info',
     [ReadyState.OPEN]: 'success',
@@ -20,17 +27,21 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
     [ReadyState.UNINSTANTIATED]: 'error',
   }[readyState] as BadgeTypeMap['props']['color']
 
-    console.log('SingleNote-readyState: ', connectionStatusColor);
+    const onTitleChange = (e: any) => { //todo: add correct type
+        sendJsonMessage({title:e.target.value, content:nt.content});
+    }
 
   return (note) ? (
     <>
+        <h1>{nt.content[0].children[0].text}</h1>
       <Badge color={connectionStatusColor} variant="dot" sx={{ width: '100%' }}>
         <TextField
-          value={note.title}
+          value={nt.title}
           variant="standard"
           fullWidth={true}
           inputProps={{ style: { fontSize: 32, color: '#666' } }}
           sx={{ mb: 2 }}
+          onChange={onTitleChange}
         />
       </Badge>
       <Paper
@@ -40,7 +51,7 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
           flexDirection: 'column',
         }}
       >
-        <Editor initialValue={note.content} title={note.title} sendJsonMessage={sendJsonMessage} />
+        <Editor initialValue={nt.content} title={nt.title} sendJsonMessage={sendJsonMessage}/>
       </Paper>
     </>
    ) : null

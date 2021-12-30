@@ -18,6 +18,8 @@ Each app has a `check` script that runs the linting and typechecking. Run it in 
 1) Persist data changes in realtime to firebase database
 2) Broadcast changes to firebase database in realtime
 3) Use database state as the source of truth for all clients
+4) Feature 'Add Note' added and persisted in realtime to all clients (branch after10)
+5) Feature 'Change Note Title' added. Changes to title are persisted to all clients in realtime (branch after10)
 
 ##Issues
 1) Default note body is not displayed

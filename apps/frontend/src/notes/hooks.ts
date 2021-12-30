@@ -23,7 +23,6 @@ import useWebSocket, { ReadyState } from 'react-use-websocket'
 export const useWSNotesList = () => {
   const { readyState, lastMessage, sendMessage, sendJsonMessage, lastJsonMessage } = useWebSocket(`ws://localhost:3001/api/notes/`);
   useEffect(() => {
-    console.log(`useWSNotesList-useEffect`);
     if (readyState === ReadyState.OPEN && lastMessage === null) {
       sendMessage('getNotes');
     }
@@ -44,7 +43,6 @@ export const useNote = (id: string) => {
   const { readyState, lastMessage, sendMessage, sendJsonMessage, lastJsonMessage } = useWebSocket(`ws://localhost:3001/api/notes/${id}`);
   // Send a message when ready on first load
   useEffect(() => {
-    console.log(`useNote-useEffect`);
     if (readyState === ReadyState.OPEN && lastMessage === null) {
       sendMessage('');
     }else if(ReadyState.OPEN && lastMessage !== null){
@@ -53,7 +51,7 @@ export const useNote = (id: string) => {
   }, [readyState, lastMessage])
 
   return {
-    note: lastMessage && JSON.parse(lastMessage.data) as NoteResponse,
+    note: lastMessage && JSON.parse(lastMessage.data) as NoteResponse | any,//todo: set type any to new type for all notes data
     readyState,
     sendMessage,
     sendJsonMessage,

@@ -32,6 +32,7 @@ export interface NoteResponse {
 
 let notes:any = {};//todo: define type
 
+//Update notes when database changes so new socket connections get the latest notes.
 const db = admin.database();
 const ref = db.ref('notes');
 ref.on('value', (snapshot) => {
@@ -59,7 +60,7 @@ const notesWSHandler: WebsocketRequestHandler = (ws, req) => {
     })
 }
 
-const storeNote = (noteId: string, note: any, ws?: any) => {
+const storeNote = (noteId: string, note: any, ws?: any) => {//todo: add proper types
     console.log('Storing Note:', noteId);
     const ref = db.ref('notes');
     try {
@@ -90,6 +91,7 @@ const storeNote = (noteId: string, note: any, ws?: any) => {
 }
 
 const noteHandler: WebsocketRequestHandler = (ws, req) => {
+
     ws.on('message', (message) => {
         const msg = message.toString();
         const id = req.params.id;
