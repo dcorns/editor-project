@@ -23,5 +23,7 @@ Each app has a `check` script that runs the linting and typechecking. Run it in 
 
 ##Issues
 1) Default note body is not displayed
-2) Using isAstChange in Editor causes a managed state to un-managed state error
+2) ~~Using isAstChange in Editor causes a managed state to un-managed state error~~
 3) Clicking on note in noteList causes 4 calls to useNote
+4) Updates to the client that is making edits to a note in the slate editor causes slate to lose track of dom path. (Error: Cannot resolve a DOM point from Slate point:)
+5) Old version of react (11.4.1) Chrome profiler requires 16.5+

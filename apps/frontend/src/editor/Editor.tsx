@@ -1,7 +1,7 @@
 // @refresh reset // Fixes hot refresh errors in development https://github.com/ianstormtaylor/slate/issues/3477
 
 import React, { useCallback, useMemo, useState} from 'react'
-import {createEditor, Descendant, BaseEditor} from 'slate'
+import {createEditor, Descendant, BaseEditor, Point, Transforms} from 'slate'
 import { withHistory, HistoryEditor } from 'slate-history'
 import { handleHotkeys } from './helpers'
 import {Editable, withReact, Slate, ReactEditor} from 'slate-react'
@@ -27,43 +27,54 @@ interface EditorProps {
 }
 
 export const Editor: React.FC<EditorProps> = ({ initialValue = [], placeholder, title, sendJsonMessage}) => {
-  const [value, setValue] = useState<Array<Descendant>>(initialValue)
+  const [value, setValue] = useState<Array<Descendant>>(initialValue);
   console.log('Editor');
   const renderElement = useCallback(props => <CustomElement {...props} />, [])
   const renderLeaf = useCallback(props => <CustomLeaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
+
   const onNoteChange = (noteData: any) => {//todo: set to specific type
-    console.log('sending json message to server', title, noteData);
-    sendJsonMessage({title, content:noteData});
+    //console.log('sending json message to server', title, noteData);
+      sendJsonMessage({title, content:noteData});
+
+
+
+      //console.dir(editor.selection);
+      //console.dir(noteData[0].children[0].text.length);
+      //const point={path: [0,0], offset: noteData[0].children[0].text.length};
+      //editor.selection = {anchor: point, focus: point};
+    //setValue(noteData);
   };
 
-  return (
-    <Slate editor={editor}
-           value={value}
-           onChange={value => {
-             setValue(value);
-           const isAstChange = editor.operations.some(
-             (op:any) => 'set_selection' !== op.type //todo: Define or obtain editor operation type
-             )
-             if (isAstChange) {
-               onNoteChange(value);
-           }
-           }}
-    >
-      <EditorToolbar />
-      <Editable
-        renderElement={renderElement}
-        renderLeaf={renderLeaf}
-        placeholder={placeholder}
-        onKeyDown={handleHotkeys(editor)}
+    return (
+        <Slate editor={editor}
+               value={initialValue}
+               onChange={value => {
+                   setValue(value);
 
-        // The dev server injects extra values to the editr and the console complains
-        // so we override them here to remove the message
-        autoCapitalize="false"
-        autoCorrect="false"
-        spellCheck="false"
-      />
-    </Slate>
-  )
+                   const isAstChange = editor.operations.some(
+                       (op:any) => 'set_selection' !== op.type //todo: Define or obtain editor operation type
+                   )
+                   if (isAstChange) {
+                       console.log('isAstChange');
+                       onNoteChange(value);
+                   }
+               }}
+        >
+            <EditorToolbar />
+            <Editable
+                renderElement={renderElement}
+                renderLeaf={renderLeaf}
+                placeholder={placeholder}
+                onKeyDown={handleHotkeys(editor)}
+
+                // The dev server injects extra values to the editr and the console complains
+                // so we override them here to remove the message
+                autoCapitalize="false"
+                autoCorrect="false"
+                spellCheck="false"
+            />
+        </Slate>
+    )
 }

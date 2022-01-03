@@ -45,8 +45,6 @@ export const useNote = (id: string) => {
   useEffect(() => {
     if (readyState === ReadyState.OPEN && lastMessage === null) {
       sendMessage('');
-    }else if(ReadyState.OPEN && lastMessage !== null){
-      console.log(`lastMessage.data: ${lastMessage.data}`);
     }
   }, [readyState, lastMessage])
 

@@ -10,12 +10,13 @@ interface SingleNoteProps {
 
 const Home: React.FC<SingleNoteProps> = ({ id }) => {
     const { note, readyState, sendJsonMessage} = useNote(id);
+    //console.dir(note);
     let nt = note;
-    console.log('SingleNote-note:');
+    //console.log('SingleNote-note:');
 
     if(note && note[id]){
-        console.log(`full list received:`);
-        console.dir(note[id].note);
+        //console.log(`full list received:`);
+        //console.dir(note[id].note);
         nt = note[id].note;
     }
 
@@ -31,9 +32,11 @@ const Home: React.FC<SingleNoteProps> = ({ id }) => {
         sendJsonMessage({title:e.target.value, content:nt.content});
     }
 
+    //console.log(readyState, connectionStatusColor);
+
   return (note) ? (
     <>
-        <h1>{nt.content[0].children[0].text}</h1>
+        {/*<div>{nt.content[0].children[0].text}</div>*/}
       <Badge color={connectionStatusColor} variant="dot" sx={{ width: '100%' }}>
         <TextField
           value={nt.title}
